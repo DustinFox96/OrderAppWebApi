@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderAppWebApi.Data;
 
 namespace OrderAppWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210305145853_test")]
+    partial class test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,9 +93,6 @@ namespace OrderAppWebApi.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<int>("Salespersonid")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(12)")
@@ -105,8 +104,6 @@ namespace OrderAppWebApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("Salespersonid");
 
                     b.ToTable("Orders");
                 });
@@ -136,30 +133,6 @@ namespace OrderAppWebApi.Migrations
                     b.ToTable("orderlines");
                 });
 
-            modelBuilder.Entity("OrderAppWebApi.Models.Salesperson", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<decimal>("Sales")
-                        .HasColumnType("decimal (9,2)");
-
-                    b.Property<string>("StateCode")
-                        .HasColumnType("nvarchar(2)")
-                        .HasMaxLength(2);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("salespeople");
-                });
-
             modelBuilder.Entity("OrderAppWebApi.Models.Order", b =>
                 {
                     b.HasOne("OrderAppWebApi.Models.Customers", "customer")
@@ -167,23 +140,17 @@ namespace OrderAppWebApi.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("OrderAppWebApi.Models.Salesperson", "Salesperson")
-                        .WithMany()
-                        .HasForeignKey("Salespersonid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("OrderAppWebApi.Models.Orderline", b =>
                 {
-                    b.HasOne("OrderAppWebApi.Models.Item", "Item")
+                    b.HasOne("OrderAppWebApi.Models.Item", "item")
                         .WithMany()
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OrderAppWebApi.Models.Order", "Order")
+                    b.HasOne("OrderAppWebApi.Models.Order", "order")
                         .WithMany("OrderLines")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)

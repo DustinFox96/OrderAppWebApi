@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EOrderAppWebApi.Controllers;
+using OrderAppWebApi.Controllers;
 using OrderAppWebApi.Data;
+using OrderAppWebApi.Models;
 
 namespace OrderAppWebApi.Controllers
 {
@@ -26,9 +27,24 @@ namespace OrderAppWebApi.Controllers
         public async Task<ActionResult<IEnumerable<Orderline>>> Getorderlines()
         {
             return await _context.orderlines
-                                            .Include(o => o.order)
-                                            .Include(i => i.item)
+                                            
+                                            .Include(i => i.Item)
                                             .ToListAsync();
+        }
+        // here we are taking the order id and creating a method that will change a orders total.
+        private async Task<IActionResult> CalculateOrderTotal(int id) {
+            var order = await _context.Orders.FindAsync(id); // here we are getting it by Id
+            if(order == null) {
+                return NotFound();
+            }
+            order.Total = _context.orderlines
+                                                 .Where(li => li.OrderId == id)
+                                                 .Sum(li => li.Quantity * li.Item.Price);
+            var rowsAffected = await _context.SaveChangesAsync();
+            if(rowsAffected != 1) {
+                throw new Exception("Failed to update order Total");
+            }
+            return Ok();
         }
 
         // GET: api/Orderlines/5
@@ -36,8 +52,8 @@ namespace OrderAppWebApi.Controllers
         public async Task<ActionResult<Orderline>> GetOrderline(int id)
         {
             var orderline = await _context.orderlines
-                                                    .Include(o => o.order)
-                                                    .Include(i => i.item)
+                                                    
+                                                    .Include(i => i.Item)
                                                     .SingleOrDefaultAsync(ol => ol.Id == id);
                                                     
 
@@ -67,6 +83,7 @@ namespace OrderAppWebApi.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                await CalculateOrderTotal(orderline.OrderId); //  this change was made due to our changes up above
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -91,6 +108,7 @@ namespace OrderAppWebApi.Controllers
         {
             _context.orderlines.Add(orderline);
             await _context.SaveChangesAsync();
+            await CalculateOrderTotal(orderline.OrderId); // this was added due to the changes up above 
 
             return CreatedAtAction("GetOrderline", new { id = orderline.Id }, orderline);
         }
@@ -107,6 +125,7 @@ namespace OrderAppWebApi.Controllers
 
             _context.orderlines.Remove(orderline);
             await _context.SaveChangesAsync();
+            await CalculateOrderTotal(orderline.OrderId); // this was added due to the changes up above 
 
             return orderline;
         }

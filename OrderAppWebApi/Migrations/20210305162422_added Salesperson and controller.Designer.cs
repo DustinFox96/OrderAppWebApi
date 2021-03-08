@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderAppWebApi.Data;
 
 namespace OrderAppWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210305162422_added Salesperson and controller")]
+    partial class addedSalespersonandcontroller
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,7 +93,7 @@ namespace OrderAppWebApi.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<int>("Salespersonid")
+                    b.Property<int?>("Salespersonid")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -170,9 +172,7 @@ namespace OrderAppWebApi.Migrations
 
                     b.HasOne("OrderAppWebApi.Models.Salesperson", "Salesperson")
                         .WithMany()
-                        .HasForeignKey("Salespersonid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Salespersonid");
                 });
 
             modelBuilder.Entity("OrderAppWebApi.Models.Orderline", b =>

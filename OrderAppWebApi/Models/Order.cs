@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OrderAppWebApi.Controllers;
 using System.Text;
 
 namespace OrderAppWebApi.Models {
@@ -14,7 +15,12 @@ namespace OrderAppWebApi.Models {
         [Column(TypeName = "decimal (9,2)")]
         public decimal Total { get; set; }
         public int CustomerId { get; set; }
-        public virtual  Customers customer  { get; set; } // this is saying it's going to be in our class but not our database
+        public virtual  Customers customer  { get; set; } // this is saying it's going to be in our class but not our database as a foreign key
+        
+        public virtual IEnumerable<Orderline> OrderLines { get; set; }
+        public int Salespersonid { get; set; }
+        public virtual Salesperson Salesperson { get; set; }
+
 
 
         public Order() { }
